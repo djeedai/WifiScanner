@@ -1,0 +1,86 @@
+﻿<Page
+    x:Class="WifiScanner.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WifiScanner"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:wifi="using:Windows.Devices.WiFi"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" d:DesignWidth="913.5" d:DesignHeight="632.5">
+    <Page.Resources>
+        <DataTemplate x:Key="DeviceTemplate" x:DataType="wifi:WiFiAdapter">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="{x:Bind NetworkAdapter.NetworkAdapterId}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="NetworkTemplate" x:DataType="local:Network">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="120"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{x:Bind Channel.Index}" />
+                <TextBlock Grid.Column="1" Text="{x:Bind WiFiNetwork.Ssid}"/>
+                <TextBlock Grid.Column="2" Text="{x:Bind WiFiNetwork.Bssid}"/>
+                <SymbolIcon Grid.Column="3" Symbol="{x:Bind local:MainPage.SymbolFromBars(WiFiNetwork.SignalBars)}"/>
+                <TextBlock Grid.Column="4" Text="{x:Bind WiFiNetwork.SecuritySettings.NetworkAuthenticationType}"/>
+                <TextBlock Grid.Column="5" Text="{x:Bind WiFiNetwork.SecuritySettings.NetworkEncryptionType}"/>
+            </Grid>
+        </DataTemplate>
+        <CollectionViewSource x:Name="AvailableNetworksSource" Source="{x:Bind AvailableNetworks}" IsSourceGrouped="true" />
+    </Page.Resources>
+    <Grid Margin="8,8,8,8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="WiFi device:" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <ComboBox x:Name="DevicesComboBox"  ItemsSource="{x:Bind AvailableDevices}" ItemTemplate="{StaticResource DeviceTemplate}" MinWidth="300" Grid.Column="2" />
+        <ListView x:Name="NetworksList" ItemsSource="{x:Bind AvailableNetworksSource.View, Mode=OneWay}" ItemTemplate="{StaticResource NetworkTemplate}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemExpanded}">
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="120"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Channel" FontWeight="Bold"/>
+                    <TextBlock Grid.Column="1" Text="SSID" FontWeight="Bold"/>
+                    <TextBlock Grid.Column="2" Text="BSSID" FontWeight="Bold"/>
+                    <TextBlock Grid.Column="3" Text="Signal" FontWeight="Bold"/>
+                    <TextBlock Grid.Column="4" Text="Auth" FontWeight="Bold"/>
+                    <TextBlock Grid.Column="5" Text="Crypt" FontWeight="Bold"/>
+                </Grid>
+            </ListView.Header>
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Band}" Foreground="Black" FontWeight="Bold" />
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListView.GroupStyle>
+        </ListView>
+        <TextBlock x:Name="StatusText" Text="Status: -" Grid.ColumnSpan="2" Grid.Row="2" />
+    </Grid>
+</Page>
